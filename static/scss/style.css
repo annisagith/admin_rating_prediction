@@ -1,0 +1,355 @@
+* {
+  font-family: "Poppins", sans-serif;
+}
+
+.login {
+  height: 100vh;
+}
+
+.header h1 {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 48px;
+  color: #000000;
+}
+
+.header p {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #737373;
+  margin-bottom: 20px;
+}
+
+.login-form label {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
+  margin-top: 20px;
+}
+
+.login-form input {
+  background: #ffffff;
+  border: 1px solid #bcbcbc;
+  box-sizing: border-box;
+  border-radius: 8px;
+}
+
+.login-form a {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #737373;
+  margin: 20px 0;
+  display: block;
+}
+
+.login-form .signin {
+  width: 100%;
+  height: 42px;
+  background: #000000;
+  border-radius: 8px;
+  color: #ffffff;
+  margin-bottom: 20px;
+  border: none;
+}
+
+.registration-form .signin {
+  width: 100%;
+  height: 42px;
+  background: #a67d79;
+  border-radius: 20px;
+  color: #ffffff;
+  margin-top: 24px;
+  border: none;
+}
+
+.login-form span {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #737373;
+}
+
+.login-form span a {
+  font-weight: 600;
+  color: #007bff;
+}
+
+.registration-form span {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #737373;
+}
+
+.registration-form span a {
+  font-weight: 600;
+}
+
+/* start topbar */
+.hello-user {
+  font-size: 24px;
+  font-weight: 400;
+}
+
+/* Search input */
+.navbar .form-control {
+  height: 24px; /* agak lebih besar biar nyaman diketik */
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+}
+
+/* Search button dengan icon di dalam lingkaran */
+.navbar .btn {
+  background-color: #a67d79;
+  border-radius: 50%;
+  width: 32px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease;
+  color: #ffffff;
+}
+
+.navbar .btn:hover {
+  background-color: #fff3e3;
+  color: #000000;
+}
+
+/* end topbar */
+
+/* Header */
+.title-header {
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.btn-custom {
+  background-color: #a67d79 !important;
+  color: white !important;
+  border: none !important;
+  transition: background-color 0.3s ease;
+}
+
+.btn-custom:hover {
+  background-color: #8a6b58 !important; /* Warna saat hover, sedikit lebih gelap */
+}
+
+/*End Header */
+
+/* Start Edit Produk */
+.container h5 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.container p {
+  color: #777;
+  font-size: 14px;
+}
+/* End Edit Produk */
+
+/
+/* FLASSH */
+.alert.hide {
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+}
+
+/* Modal body */
+.modal-body {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.gambar-produk {
+  flex-shrink: 0; /* Supaya div gambar ini fix */
+}
+
+.gambar-produk img {
+  width: 150px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* Informasi Produk */
+.informasi-produk {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Brand Produk */
+.brand-produk {
+  font-size: 24px;
+  font-weight: 600; /* Semi-bold */
+  color: #000;
+  margin-bottom: 0;
+}
+
+/* Nama Produk */
+.nama-produk {
+  font-size: 16px;
+  font-weight: 400;
+  color: #000;
+  margin-bottom: 0;
+}
+
+/* Harga Produk */
+.harga-produk {
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.56);
+  margin-bottom: 0;
+}
+
+/* Jumlah Review */
+.jumlah-review {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.56);
+  margin-bottom: 0;
+}
+
+/* Rating Produk */
+.rating-produk {
+  font-size: 14px;
+  font-weight: 600;
+  color: #687d94;
+  margin-bottom: 0;
+}
+
+/* Deskripsi Produk */
+.deskripsi-produk {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.56);
+  margin-bottom: 0;
+}
+
+.btn-tutup {
+  background-color: #a67d79 !important;
+  color: #ffffff !important;
+}
+
+.btn-tutup:hover {
+  background-color: #935f5a !important;
+  color: #ffffff !important;
+}
+
+/* Mengatur lebar modal agar tidak terlalu lebar */
+.modal-dialog {
+  max-width: 400px;
+}
+
+/* Ikon trash di kiri */
+.modal-body i {
+  font-size: 40px;
+}
+
+/* Menata teks di dalam modal */
+.modal-body p {
+  margin: 0;
+}
+
+/* Teks konfirmasi */
+.modal-body p:first-child {
+  font-weight: bold;
+}
+
+/* Menata tombol modal */
+.modal-footer button {
+  min-width: 80px;
+}
+
+/* Kolom Aksi */
+.col-aksi {
+  width: 250px;
+  text-align: center;
+}
+
+/* Kolom Harga */
+.col-harga {
+  width: 100px;
+}
+
+/* PAGINATION */
+.page-link {
+  background-color: #f8f9fa; /* warna dasar tombol */
+  color: #000000 !important; /* warna teks: hitam */
+  border: 1px solid #a67d79;
+}
+
+.page-link:hover {
+  background-color: #a67d79; /* warna saat hover */
+  color: #ffffff; /* teks putih saat hover */
+  border: 1px solid #a67d79;
+}
+
+.page-item.active .page-link {
+  background-color: #a67d79; /* warna aktif */
+  border-color: #a67d79;
+  color: #ffffff !important; /* teks putih di halaman aktif */
+}
+
+.dashboard-card {
+  background-color: rgba(255, 243, 227, 0.5);
+  color: #000000;
+  width: 262px;
+  height: 130px;
+  border-radius: 20px;
+  display: flex;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.card-icon {
+  margin-left: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.card-icon i {
+  width: 50px;
+  height: 50px;
+  font-size: 30px; /* Ukuran ikon di dalam box, bisa disesuaikan */
+  background-color: #a67d79;
+  color: #fff; /* Warna ikon */
+  border-radius: 15%; /* Membuat icon bulat */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.card-title {
+  font-size: 16px;
+  margin: 0;
+}
+
+.card-value {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 5px 0;
+}

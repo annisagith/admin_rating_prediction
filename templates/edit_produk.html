@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Data Produk{% endblock %}
+
+{% block header %}
+<div class="py-2 px-2 d-flex justify-content-between align-items-center">
+  <h2 class="title-header" >
+    <a href="{{ url_for('produk') }}" class="text-decoration-none text-dark">Data Produk ></a> Edit Produk</h2>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+      <div class="text-center">
+        <h5>Form Edit Produk</h5>
+        <p>Inputkan Perubahan Data Pada Form Di Bawah  🎉 </p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <!-- Form Edit Produk -->
+      <form action="{{ url_for('edit_produk', id_produk=produk[0]) }}" method="post" enctype="multipart/form-data">
+        <div class="row justify-content-center h-100">
+          <!-- Kolom Kiri -->
+          <div class="col-md-5">
+            <div class="mb-3">
+              <label for="nama_produk" class="form-label">Nama Produk</label>
+              <input type="text" class="form-control" id="nama_produk" name="nama_produk" value="{{ produk[1] }}" placeholder="Masukkan Nama Produk" autocomplete="off" required>
+            </div>
+            <div class="mb-3">
+              <label for="nama_brand" class="form-label">Nama Brand</label>
+              <input type="text" class="form-control" id="nama_brand" name="nama_brand" value="{{ produk[2] }}" placeholder="Masukkan Nama Brand" autocomplete="off" required>
+            </div>
+            <div class="mb-3">
+                <label for="jenis" class="form-label">Jenis</label>
+                <input type="text" class="form-control" id="jenis" name="jenis" value="{{ produk[3] }}" placeholder="Masukkan Jenis Produk" autocomplete="off" required>
+            </div>
+                <div class="mb-3">
+                <label for="harga" class="form-label">Harga</label>
+                <input type="number" class="form-control" id="harga" name="harga" value="{{ produk[5] }}" min="0" placeholder="Masukkan Harga Produk" autocomplete="off" required>
+            </div>
+          </div>
+
+          <!-- Kolom Kanan -->
+          <div class="col-md-5">
+            <div class="mb-3">
+              <label for="deskripsi" class="form-label">Deskripsi</label>
+              <textarea class="form-control" id="deskripsi" name="deskripsi" rows="4" placeholder="Masukkan Deskripsi Produk" required>{{ produk[4] }}</textarea>
+            </div>
+            <div class="mb-3">
+              <label for="foto" class="form-label">Foto</label>
+              <input type="file" class="form-control" id="foto" name="foto" accept="image/*" placeholder="Pilih Foto" autocomplete="off">
+            </div>
+            <div class="registration-form">
+              <button type="submit" class="signin">Update Produk</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div> 
+    {% endblock %}

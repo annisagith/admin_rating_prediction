@@ -1,0 +1,25 @@
+<!-- START TOPBAR -->
+<nav class="navbar navbar-light shadow-sm" style="height: 56px">
+  <div
+    class="container-fluid d-flex justify-content-between align-items-center"
+  >
+    <!-- Hello User -->
+    <h5 class="mb-0 px-2 hello-user">Hello, {{ session['username'] }}</h5>
+    {% if show_search %}
+    <form class="d-flex" method="GET" action="{{ search_url }}" role="search">
+      <input
+        class="form-control form-control-sm me-2"
+        type="search"
+        name="search"
+        placeholder="Cari..."
+        aria-label="Search"
+        value="{{ request.args.get('search', '') }}"
+      />
+      <button class="btn btn-sm" type="submit">
+        <i class="lni lni-search"></i>
+      </button>
+    </form>
+    {% endif %}
+  </div>
+</nav>
+<!-- END TOPBAR -->

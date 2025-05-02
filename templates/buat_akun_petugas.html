@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Buat Akun Petugas{% endblock %}
+
+{% block header %}
+<div class="py-2 px-2 d-flex justify-content-between align-items-center">
+  <h2 class="title-header" >
+    <a href="{{ url_for('petugas') }}" class="text-decoration-none text-dark">Data Petugas ></a> Buat Akun Petugas</h2>
+</div>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+      <div class="text-center">
+        <h5>Form Buat Akun Petugas</h5>
+        <p>Lengkapi form ini untuk buat akun petugas 🎉</p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <form action="{{ url_for('buat_akun_petugas') }}" method="post">
+        <div class="row justify-content-center h-100">
+          <!-- Kolom Kiri -->
+          <div class="col-md-5">
+            <div class="mb-3">
+              <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
+              <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" placeholder="Masukkan Nama Lengkap" autocomplete="off" required>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan Email" autocomplete="off" required>
+            </div>
+            <div class="mb-3">
+              <label for="role" class="form-label">Role</label>
+              <select class="form-select" name="role" id="role" required>
+                <option value="">...Pilih Role...</option>
+                <option value="admin">Petugas</option>
+                <option value="superadmin">Super Admin</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Kolom Kanan -->
+          <div class="col-md-5">
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan Username" autocomplete="off" required>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan Password" autocomplete="off" required>
+            </div>
+            <div class="registration-form">
+              <button type="submit" class="signin">Buat Akun</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div> 
+{% endblock %}
+

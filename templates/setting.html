@@ -1,0 +1,107 @@
+{% extends 'base.html' %} {% block title %}Setting Profile{% endblock %} {%
+block header %}
+<div class="py-2 px-2 d-flex justify-content-between align-items-center">
+  <h2 class="title-header">Setting Profile</h2>
+</div>
+{% endblock %} {% block content %}
+<div class="container">
+  <div class="text-center">
+    <h5>Edit Profile</h5>
+    <p>Inputkan Perubahan Data Pada Form Di Bawah 🎉</p>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div
+      class="alert alert-{{ category }} alert-dismissible fade show"
+      role="alert"
+    >
+      <strong>{{ message }}</strong>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+      ></button>
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+  </div>
+
+  <form action="{{ url_for('setting_profile') }}" method="post">
+    <div class="row justify-content-center h-100">
+      <!-- Kolom Kiri -->
+      <div class="col-md-5">
+        <div class="mb-3">
+          <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
+          <input
+            type="text"
+            class="form-control"
+            id="nama_lengkap"
+            name="nama_lengkap"
+            value="{{ akun[4] }}"
+            placeholder="Masukkan Nama Lengkap"
+            autocomplete="off"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            name="email"
+            value="{{ akun[3] }}"
+            placeholder="Masukkan Email"
+            autocomplete="off"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input
+            type="text"
+            class="form-control"
+            id="username"
+            name="username"
+            value="{{ akun[1] }}"
+            placeholder="Masukkan Username"
+            autocomplete="off"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Kolom Kanan -->
+      <div class="col-md-5">
+        <div class="mb-3">
+          <label for="old_password" class="form-label">Password Lama</label>
+          <input
+            type="password"
+            class="form-control"
+            id="old_password"
+            name="old_password"
+            placeholder="Masukkan Password Lama"
+            autocomplete="off"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="new_password" class="form-label"
+            >Password Baru (Opsional)</label
+          >
+          <input
+            type="password"
+            class="form-control"
+            id="new_password"
+            name="new_password"
+            placeholder="Masukkan Password Baru"
+            autocomplete="off"
+          />
+        </div>
+        <div class="registration-form">
+          <button type="submit" class="signin">Simpan</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

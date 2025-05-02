@@ -1,0 +1,71 @@
+<!-- START SIDEBAR -->
+<aside id="sidebar">
+  <div class="d-flex">
+    <button id="toggle-btn" type="button">
+      <img
+        src="{{ url_for('static', filename='img/logo_acnerate1.png') }}"
+        alt="Toggle"
+        style="width: 30px; height: auto"
+      />
+    </button>
+    <div class="sidebar-logo">
+      <a href="#">AcneRate</a>
+    </div>
+  </div>
+  <ul class="sidebar-nav">
+    <li class="sidebar-item">
+      <a
+        href="{{ url_for('index') }}"
+        class="sidebar-link {% if request.path == url_for('index') %}active{% endif %}"
+      >
+        <i class="lni lni-dashboard"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+    <li class="sidebar-item">
+      <a
+        href="{{ url_for('produk') }}"
+        class="sidebar-link {% if '/produk' in request.path %}active{% endif %}"
+      >
+        <i class="lni lni-dropbox-original"></i>
+        <span>Data Produk</span>
+      </a>
+    </li>
+    {% if session['role'] == 'superadmin' %}
+    <li class="sidebar-item">
+      <a
+        href="{{ url_for('petugas') }}"
+        class="sidebar-link {% if '/petugas' in request.path %}active{% endif %}"
+      >
+        <i class="lni lni-users"></i>
+        <span>Data Petugas</span>
+      </a>
+    </li>
+    <li class="sidebar-item">
+      <a
+        href="{{ url_for('aktivitas') }}"
+        class="sidebar-link {% if request.path == url_for('aktivitas') %}active{% endif %}"
+      >
+        <i class="lni lni-timer"></i>
+        <span>Log Aktivitas</span>
+      </a>
+    </li>
+    {% endif %}
+    <li class="sidebar-item">
+      <a
+        href="{{ url_for('setting_profile') }}"
+        class="sidebar-link {% if request.path == url_for('setting_profile') %}active{% endif %}"
+      >
+        <i class="lni lni-cog"></i>
+        <span>Setting</span>
+      </a>
+    </li>
+  </ul>
+  <div class="sidebar-footer">
+    <a href="{{ url_for('logout') }}" class="sidebar-link">
+      <i class="lni lni-exit"></i>
+      <span>Logout</span>
+    </a>
+  </div>
+</aside>
+<!-- END SIDEBAR -->
