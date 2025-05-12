@@ -1,28 +1,14 @@
-{% extends 'base.html' %}
-
-{% block title %}Kelola Data Produk{% endblock %}
-
-{% block header %}
+{% extends 'base.html' %} {% block title %}Kelola Data Produk{% endblock %} {% block header %}
 <div class="py-2 px-2 d-flex justify-content-between align-items-center mb-3">
   <h2 class="title-header">Data Produk</h2>
-  <a href="{{ url_for('tambah_produk') }}" class="btn-custom btn">
-    <i class="lni lni-plus"></i> Tambah Produk
-  </a>
+  <a href="{{ url_for('tambah_produk') }}" class="btn-custom btn"> <i class="lni lni-plus"></i> Tambah Produk </a>
 </div>
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-        <strong>{{ message }}</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-{% endblock %}
-
-{% block content %}
-{% if produk %}
+{% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+  <strong>{{ message }}</strong>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %} {% endif %} {% endwith %} {% endblock %} {% block content %} {% if produk %}
 <table class="table table-striped">
   <thead>
     <tr>
@@ -36,115 +22,111 @@
     </tr>
   </thead>
   <tbody>
-      {% for p in produk %}
-      <tr>
-          <th scope="row">{{ loop.index }}</th>
-          <td >{{ p[1] }}</td> <!-- nama_produk -->
-          <td>{{ p[2] }}</td> <!-- nama_brand -->
-          <td>{{ p[3] }}</td> <!-- jenis -->
-          <td>Rp {{ "{:,.0f}".format(p[5]|int).replace(',', '.') }}</td> <!-- harga -->
-          <td>{{ p[6] }}</td> <!-- rating_total -->
-          <td>
-            <!-- Tombol Edit -->
-            <a href="{{ url_for('edit_produk', id_produk=p[0]) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Produk">
-                <i class="lni lni-pencil-alt"></i> Edit
-            </a>
+    {% for p in produk %}
+    <tr>
+      <th scope="row">{{ loop.index }}</th>
+      <td>{{ p.nama_produk }}</td>
+      <!-- nama_produk -->
+      <td>{{ p.nama_brand }}</td>
+      <!-- nama_brand -->
+      <td>{{ p.nama_jenis }}</td>
+      <!-- jenis_produk -->
+      <td>Rp {{ "{:,.0f}".format(p.harga|int).replace(',', '.') }}</td>
+      <!-- harga -->
+      <td>{{ p.rating_total }}</td>
+      <!-- rating_total -->
+      <td>
+        <!-- Tombol Edit -->
+        <a href="{{ url_for('edit_produk', id_produk=p.id_produk) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Produk"> <i class="lni lni-pencil-alt"></i> Edit </a>
 
-            <!-- Tombol Hapus -->
-            <!-- Tombol yang membuka modal -->
-            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#hapusModal{{ loop.index }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus Produk">
-                <i class="lni lni-trash-can"></i> Hapus
-            </button>
+        <!-- Tombol Hapus -->
+        <!-- Tombol yang membuka modal -->
+        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#hapusModal{{ loop.index }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus Produk">
+          <i class="lni lni-trash-can"></i> Hapus
+        </button>
 
-            <!-- Modal Konfirmasi Hapus -->
-            <div class="modal fade" id="hapusModal{{ loop.index }}" tabindex="-1" aria-labelledby="hapusModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-body d-flex align-items-center">
-                            <!-- Icon di sebelah kiri -->
-                            <i class="lni lni-trash-can fs-3 text-danger me-3"></i>
+        <!-- Modal Konfirmasi Hapus -->
+        <div class="modal fade" id="hapusModal{{ loop.index }}" tabindex="-1" aria-labelledby="hapusModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-body d-flex align-items-center">
+                <!-- Icon di sebelah kiri -->
+                <i class="lni lni-trash-can fs-3 text-danger me-3"></i>
 
-                            <!-- Teks di sebelah kanan -->
-                            <div>
-                                <p><strong>Simpan Perubahan</strong></p>
-                                <p>Apakah Anda yakin ingin menghapus produk <strong>{{ p[1] }}</strong>?</p>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <!-- Tombol Batal -->
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
-                            <!-- Tombol Ya untuk menghapus produk -->
-                            <form action="{{ url_for('hapus_produk', id_produk=p[0]) }}" method="POST">
-                                <button type="submit" class="btn btn-tutup">Ya</button>
-                            </form>
-                        </div>
-                    </div>
+                <!-- Teks di sebelah kanan -->
+                <div>
+                  <p><strong>Simpan Perubahan</strong></p>
+                  <p>Apakah Anda yakin ingin menghapus produk <strong>{{ p.nama_brand }}</strong>?</p>
                 </div>
+              </div>
+              <div class="modal-footer">
+                <!-- Tombol Batal -->
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
+                <!-- Tombol Ya untuk menghapus produk -->
+                <form action="{{ url_for('hapus_produk', id_produk=p.id_produk) }}" method="POST">
+                  <button type="submit" class="btn btn-tutup">Ya</button>
+                </form>
+              </div>
             </div>
-        
-            <!-- Tombol Detail -->
-            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#target{{ loop.index }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Detail Produk">
-                <i class="lni lni-eye"></i> Detail
-            </button>
-        
-            <!-- Modal Detail -->
-            <div id="target{{ loop.index }}" class="modal fade" role="dialog" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content px-2 py-4">
-                        <div class="modal-body d-flex">
-                            <div class="gambar-produk">
-                                <img src="{{ url_for('static', filename='/' + p[7]) }}" alt="{{ p[1] }}" width="174" class="img-fluid">
-                            </div>
-                            <div class="informasi-produk ms-3">
-                                <h5 class="brand-produk"><strong>{{ p[2] }}</strong></h5>
-                                <p class="nama-produk">{{ p[1] }}</p>
-                                <p class="harga-produk"> Rp {{ "{:,.0f}".format(p[5]|int).replace(',', '.') }}</p>
-                                <p class="jumlah-review"> jumlah review</p>
-                                <p class="rating-produk"> {{ p[6] }}</p>
-                                <p class="deskripsi-produk"> {{ p[4] }}</p>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-tutup" data-bs-dismiss="modal">Tutup</button>
-                        </div>
-                    </div>
+          </div>
+        </div>
+
+        <!-- Tombol Detail -->
+        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#target{{ loop.index }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Detail Produk">
+          <i class="lni lni-eye"></i> Detail
+        </button>
+
+        <!-- Modal Detail -->
+        <div id="target{{ loop.index }}" class="modal fade" role="dialog" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content px-2 py-4">
+              <div class="modal-body d-flex">
+                <div class="gambar-produk">
+                  <img src="{{ url_for('static', filename='/' + p.path_foto_produk) }}" alt="{{ p.nama_produk }}" width="174" class="img-fluid" />
                 </div>
+                <div class="informasi-produk ms-3">
+                  <h5 class="brand-produk"><strong>{{ p.nama_brand }}</strong></h5>
+                  <p class="nama-produk">{{ p.nama_produk }}</p>
+                  <p class="harga-produk">Rp {{ "{:,.0f}".format(p.harga|int).replace(',', '.') }}</p>
+                  <p class="jumlah-review">jumlah review</p>
+                  <p class="rating-produk">{{ p.rating_total }}</p>
+                  <p class="deskripsi-produk">{{ p.deskrispi }}</p>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-tutup" data-bs-dismiss="modal">Tutup</button>
+              </div>
             </div>
-        </td>        
-      </tr>
-      {% endfor %}
+          </div>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
   </tbody>
 </table>
 <nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
-
-        {% if page > 1 %}
-        <li class="page-item">
-        <a class="page-link" href="{{ url_for('produk', page=page-1) }}" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-        </a>
-        </li>
-        {% endif %}
-
-        {% for p in range(1, total_pages + 1) %}
-        <li class="page-item {% if p == page %}active{% endif %}">
-        <a class="page-link" href="{{ url_for('produk', page=p) }}">{{ p }}</a>
-        </li>
-        {% endfor %}
-
-        {% if page < total_pages %}
-        <li class="page-item">
-        <a class="page-link" href="{{ url_for('produk', page=page+1) }}" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-        </a>
-        </li>
-        {% endif %}
-
-    </ul>
-</nav>  
+  <ul class="pagination justify-content-center">
+    {% if page > 1 %}
+    <li class="page-item">
+      <a class="page-link" href="{{ url_for('produk', page=page-1) }}" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    {% endif %} {% for p in range(1, total_pages + 1) %}
+    <li class="page-item {% if p == page %}active{% endif %}">
+      <a class="page-link" href="{{ url_for('produk', page=p) }}">{{ p }}</a>
+    </li>
+    {% endfor %} {% if page < total_pages %}
+    <li class="page-item">
+      <a class="page-link" href="{{ url_for('produk', page=page+1) }}" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
 {% else %}
 <div class="text-center py-5">
-    <h4 class="text-muted">Produk Belum Tersedia</h4>
+  <h4 class="text-muted">Produk Belum Tersedia</h4>
 </div>
-{% endif %}
-{% endblock %}
+{% endif %} {% endblock %}

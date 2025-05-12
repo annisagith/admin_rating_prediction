@@ -8,6 +8,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
 from flask import session, redirect, url_for, flash
+from MySQLdb.cursors import DictCursor
+from collections import defaultdict
 
 # membuat variabel sebagai instance flask
 app = Flask(__name__)
@@ -18,6 +20,7 @@ app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'prediksi_rating'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'  # Ini yang benar
 mysql = MySQL(app)
 
 
@@ -59,18 +62,17 @@ def index():
     
     cursor = mysql.connection.cursor()
 
-    cursor.execute("SELECT COUNT(*) FROM produk")
-    total_produk = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*) AS total FROM produk")
+    total_produk = cursor.fetchone()['total']
 
-    cursor.execute("SELECT COUNT(*) FROM admin")
-    total_admin = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*) AS total FROM admin")
+    total_admin = cursor.fetchone()['total']
 
-    cursor.execute("SELECT COUNT(DISTINCT nama_brand) FROM produk")
-    total_brand = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(DISTINCT id_brand) AS total FROM produk")
+    total_brand = cursor.fetchone()['total']
 
-
-    cursor.execute("SELECT COUNT(*) FROM ulasan")
-    total_ulasan = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*) AS total FROM ulasan")
+    total_ulasan = cursor.fetchone()['total']
 
     cursor.close()
 
@@ -94,13 +96,13 @@ def login():
         
         if akun is None:
             flash('Login Gagal, Cek Email Anda', 'danger')
-        elif not check_password_hash(akun[2], password):
+        elif not check_password_hash(akun['password'], password):
             flash('Login Gagal, Cek Password Anda', 'danger')
         else:
             session['loggedin'] = True
-            session['id_admin'] = akun[0] 
-            session['username'] = akun[1]
-            session['role'] = akun[5] 
+            session['id_admin'] = akun['id_admin']
+            session['username'] = akun['username']
+            session['role'] = akun['role']
             return redirect(url_for('index'))
     return render_template('login.html')
 
@@ -132,22 +134,44 @@ def produk():
     if search_query:
         # Jika ada pencarian, filter berdasarkan nama produk
         cursor.execute("""
-            SELECT COUNT(*) FROM produk WHERE nama_produk LIKE %s
+            SELECT COUNT(*) 
+            FROM produk p
+            LEFT JOIN jenis_produk jp ON p.id_jenis = jp.id_jenis
+            LEFT JOIN brand b ON p.id_brand = b.id_brand
+            WHERE p.nama_produk LIKE %s
         """, ('%' + search_query + '%',))
     else:
         # Jika tidak ada pencarian, hitung semua produk
-        cursor.execute("SELECT COUNT(*) FROM produk")
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM produk p
+            LEFT JOIN jenis_produk jp ON p.id_jenis = jp.id_jenis
+            LEFT JOIN brand b ON p.id_brand = b.id_brand
+        """)
         
-    total_produk = cursor.fetchone()[0]
+    total_produk = cursor.fetchone()['COUNT(*)']
     
     if search_query:
         # Jika ada pencarian, ambil produk yang sesuai dengan kata kunci
         cursor.execute('''
-            SELECT * FROM produk WHERE nama_produk LIKE %s LIMIT %s OFFSET %s
+            SELECT p.*, jp.nama_jenis, b.nama_brand
+            FROM produk p
+            LEFT JOIN jenis_produk jp ON p.id_jenis = jp.id_jenis
+            LEFT JOIN brand b ON p.id_brand = b.id_brand
+            WHERE p.nama_produk LIKE %s 
+            ORDER BY p.updated_at DESC
+            LIMIT %s OFFSET %s
         ''', ('%' + search_query + '%', per_page, offset))
     else:
         # Jika tidak ada pencarian, ambil semua produk
-        cursor.execute('SELECT * FROM produk LIMIT %s OFFSET %s', (per_page, offset))
+        cursor.execute('''
+            SELECT p.*, jp.nama_jenis, b.nama_brand
+            FROM produk p
+            LEFT JOIN jenis_produk jp ON p.id_jenis = jp.id_jenis
+            LEFT JOIN brand b ON p.id_brand = b.id_brand
+            ORDER BY p.updated_at DESC
+            LIMIT %s OFFSET %s
+        ''', (per_page, offset))
     
     produk = cursor.fetchall()
     
@@ -163,10 +187,22 @@ def tambah_produk():
         flash('Harap Login Dulu', 'danger')
         return redirect(url_for('login'))
     
+    # Ambil semua jenis produk dari tabel jenis_produk untuk dropdown
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM jenis_produk")
+    jenis_produk_list = cursor.fetchall()
+    cursor.close()
+    
+    # Ambil semua brand produk dari tabel brand untuk dropdown
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM brand")
+    brand_produk_list = cursor.fetchall()
+    cursor.close()
+    
     if request.method == 'POST':
+        id_jenis = request.form['id_jenis']
+        id_brand = request.form['id_brand']
         nama_produk = request.form['nama_produk']
-        nama_brand = request.form['nama_brand']
-        jenis = request.form['jenis']
         harga = request.form['harga']
         deskripsi = request.form['deskripsi']
         # Ambil file dari input
@@ -192,9 +228,9 @@ def tambah_produk():
         cursor = mysql.connection.cursor()
         id_produk = str(uuid.uuid4())  # Buat UUID-nya sendiri
         cursor.execute('''
-            INSERT INTO produk (id_produk, nama_produk, nama_brand, jenis, deskripsi, harga, rating_total, path_foto_produk, created_at, updated_at)
+            INSERT INTO produk (id_produk, nama_produk, id_brand, id_jenis, deskripsi, harga, rating_total, path_foto_produk, created_at, updated_at)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
-        ''', (id_produk, nama_produk, nama_brand, jenis, deskripsi, harga, 0, path_foto_produk))
+        ''', (id_produk, nama_produk, id_brand, id_jenis, deskripsi, harga, 0, path_foto_produk))
         mysql.connection.commit()
 
         flash('Produk berhasil ditambahkan!', 'success')
@@ -202,9 +238,8 @@ def tambah_produk():
         log_aktivitas(session['id_admin'], 'Tambah Produk', id_produk=id_produk, deskripsi=f'Menambahkan Produk: {nama_produk}')
 
         return redirect(url_for('produk'))
-    return render_template('tambah_produk.html')
+    return render_template('tambah_produk.html', jenis_produk=jenis_produk_list, brand_produk=brand_produk_list)
 
-# edit produk
 @app.route('/produk/edit/<string:id_produk>', methods=['GET', 'POST'])
 def edit_produk(id_produk):
     if 'loggedin' not in session:
@@ -221,11 +256,23 @@ def edit_produk(id_produk):
         flash('Produk tidak ditemukan!', 'danger')
         return redirect(url_for('produk'))
 
+    # Ambil semua jenis produk dari tabel jenis_produk untuk dropdown
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM jenis_produk")
+    jenis_produk_list = cursor.fetchall()
+    cursor.close()
+    
+    # Ambil semua brand produk dari tabel brand_produk untuk dropdown
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM brand")
+    brand_produk_list = cursor.fetchall()
+    cursor.close()
+    
     if request.method == 'POST':
+        id_jenis = request.form['id_jenis']
+        id_brand = request.form['id_brand']
         # Ambil data yang diupdate
         nama_produk = request.form['nama_produk']
-        nama_brand = request.form['nama_brand']
-        jenis = request.form['jenis']
         harga = request.form['harga']
         deskripsi = request.form['deskripsi']
         foto_baru = request.files['foto']
@@ -238,15 +285,15 @@ def edit_produk(id_produk):
             foto_baru.save(filepath)
             path_foto_produk = f'uploads/{filename}'
         else:
-            path_foto_produk = produk[7]  # Jika tidak ada foto baru, gunakan foto lama
+            path_foto_produk = produk['path_foto_produk']  # Jika tidak ada foto baru, gunakan foto lama
 
         # Update data produk di database
         cursor = mysql.connection.cursor()
-        cursor.execute('''
+        cursor.execute(''' 
             UPDATE produk
-            SET nama_produk = %s, nama_brand = %s, jenis = %s, deskripsi = %s, harga = %s, path_foto_produk = %s, updated_at = NOW()
+            SET nama_produk = %s, id_brand = %s, id_jenis = %s, deskripsi = %s, harga = %s, path_foto_produk = %s, updated_at = NOW()
             WHERE id_produk = %s
-        ''', (nama_produk, nama_brand, jenis, deskripsi, harga, path_foto_produk, id_produk))
+        ''', (nama_produk, id_brand, id_jenis, deskripsi, harga, path_foto_produk, id_produk))
         mysql.connection.commit()
         cursor.close()
 
@@ -255,7 +302,7 @@ def edit_produk(id_produk):
         return redirect(url_for('produk'))
 
     # Render form edit dengan data produk yang sudah ada
-    return render_template('edit_produk.html', produk=produk)
+    return render_template('edit_produk.html', produk=produk, jenis_produk=jenis_produk_list, brand_produk=brand_produk_list)
 
 # hapus produk
 @app.route('/produk/hapus/<string:id_produk>', methods=['POST'])
@@ -271,7 +318,7 @@ def hapus_produk(id_produk):
     
     if gambar:
         # Hapus gambar dari folder static/uploads
-        path = os.path.join('static/uploads', gambar[0])
+        path = os.path.join('static/uploads', gambar['path_foto_produk'])
         if os.path.exists(path):
             os.remove(path)
     
@@ -328,7 +375,7 @@ def petugas():
         # Jika tidak ada pencarian, hitung semua produk
         cursor.execute("SELECT COUNT(*) FROM admin")
         
-    total_akun = cursor.fetchone()[0]
+    total_akun = cursor.fetchone()['COUNT(*)']
 
     if search_query:
         # Jika ada pencarian, ambil produk yang sesuai dengan kata kunci
@@ -422,7 +469,7 @@ def edit_data_petugas(id_petugas):
                 return render_template('edit_petugas.html', petugas=petugas)
             password_hashed = generate_password_hash(password)
         else:
-            password_hashed = petugas[2]
+            password_hashed = petugas['password']
         
         # Update data petugas di database
         cursor.execute('''
@@ -490,7 +537,7 @@ def setting_profile():
             return redirect(url_for('logout'))
 
         # Cek apakah password lama benar
-        password_db = akun[2]  # Ambil password yang ada di database
+        password_db = akun['password']  # Ambil password yang ada di database
         if not check_password_hash(password_db, old_password):
             flash('Password lama salah!', 'danger')
             return redirect(url_for('setting_profile'))
@@ -572,7 +619,7 @@ def aktivitas():
     else:
         cursor.execute("SELECT COUNT(*) FROM log_aktivitas")
         
-    total_logs = cursor.fetchone()[0]
+    total_logs = cursor.fetchone()['COUNT(*)']
     
     # Ambil data log aktivitas dengan filter dan pagination
     if search_query:
@@ -607,7 +654,8 @@ def aktivitas():
     
     logs = cursor.fetchall()
     
-    # Ambil data untuk chart (jumlah aktivitas per admin)
+    # --- CHART DATA ---
+
     cursor.execute("""
         SELECT 
             a.nama_lengkap,
@@ -620,14 +668,20 @@ def aktivitas():
     """)
     chart_data_raw = cursor.fetchall()
     cursor.close()
-    
-    # Strukturkan data untuk chart.js (per admin: {Tambah, Edit})
-    from collections import defaultdict
+
+    # Struktur data chart
     chart_data = defaultdict(lambda: {'Tambah Produk': 0, 'Edit Produk': 0})
-    for nama_admin, aktivitas, jumlah in chart_data_raw:
+    for row in chart_data_raw:
+        nama_admin = row['nama_lengkap']
+        aktivitas = row['aktivitas']
+        jumlah = row['jumlah']
         chart_data[nama_admin][aktivitas] = jumlah
 
-    # Siapkan data untuk dikirim ke template
+    # Debug print to console
+    print("=== DEBUG Chart Data ===")
+    print(dict(chart_data))
+
+    # Convert to list for Chart.js
     labels = list(chart_data.keys())
     tambah_counts = [chart_data[nama]['Tambah Produk'] for nama in labels]
     edit_counts = [chart_data[nama]['Edit Produk'] for nama in labels]

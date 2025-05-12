@@ -18,3 +18,4 @@ alerts.forEach(function(alert) {
 });
 }, 1500);
 
+

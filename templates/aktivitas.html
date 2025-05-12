@@ -32,7 +32,12 @@
                 const labels = JSON.parse(canvas.dataset.labels);
                 const tambahData = JSON.parse(canvas.dataset.tambah);
                 const editData = JSON.parse(canvas.dataset.edit);
-            
+                
+                console.log(labels, tambahData, editData);
+                console.log("Labels:", labels);  // Cek apakah data labels sudah ada
+                console.log("Tambah Data:", tambahData);  // Cek apakah data tambahData sudah ada
+                console.log("Edit Data:", editData);  // Cek apakah data editData sudah ada
+
                 const ctx = canvas.getContext("2d");
                 new Chart(ctx, {
                     type: 'line',
@@ -106,26 +111,26 @@
         <tr>
           <th scope="row">{{ loop.index }}</th>
           <td>
-            {% if log[0] == 'Tambah Produk' %}
+            {% if log['aktivitas'] == 'Tambah Produk' %}
               <span class="badge bg-success">Tambah Produk</span>
-            {% elif log[0] == 'Edit Produk' %}
+            {% elif log['aktivitas'] == 'Edit Produk' %}
               <span class="badge bg-warning text-dark">Edit Produk</span>
-            {% elif log[0] == 'Hapus Produk' %}
+            {% elif log['aktivitas'] == 'Hapus Produk' %}
               <span class="badge bg-danger">Hapus Produk</span>
             {% else %}
-              <span class="badge bg-secondary">{{ log[0] }}</span>
+              <span class="badge bg-secondary">{{ log['aktivitas'] }}</span>
             {% endif %}
           </td>
-          <td>{{ log[1] }}</td>
-          <td>{{ log[2] }}</td>
+          <td>{{ log['nama_produk'] }}</td>
+          <td>{{ log['nama_lengkap'] }}</td>
           <td>
-            {% if log[3] %}
-              {{ log[3].strftime('%Y-%m-%d %H:%M:%S') }}
+            {% if log.created_at %}
+              {{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
             {% else %}
               N/A
             {% endif %}
           </td>
-          <td>{{ log[4] }}</td>
+          <td>{{ log.deskripsi }}</td>
         </tr>
         {% endfor %}
       </tbody>

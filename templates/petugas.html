@@ -38,19 +38,19 @@
       {% for p in petugas %}
         <tr>
           <th scope="row">{{ loop.index }}</th>
-          <td>{{ p[1] }}</td> <!-- Username -->
-          <td>{{ p[4] }}</td> <!-- Nama Lengkap-->
-          <td>{{ p[3] }}</td> <!-- Email -->
-          <td>{{ 'Petugas' if p[5] == 'admin' else 'Super Admin' if p[5] == 'superadmin' else p[5] }}</td>
+          <td>{{ p.username }}</td> <!-- Username -->
+          <td>{{ p.nama_lengkap }}</td> <!-- Nama Lengkap-->
+          <td>{{ p.email }}</td> <!-- Email -->
+          <td>{{ 'Petugas' if p[5] == 'admin' else 'Super Admin' if p.role == 'superadmin' else p.role }}</td>
           <td>
             <!-- Tombol Edit -->
-            <a href="{{ url_for('edit_data_petugas', id_petugas=p[0]) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Data Petugas">
+            <a href="{{ url_for('edit_data_petugas', id_petugas=p.id_admin) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Data Petugas">
                 <i class="lni lni-pencil-alt"></i> Edit
             </a>
         
             <!-- Tombol Hapus -->
             <!-- Tombol yang membuka modal -->
-            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#hapusModal{{ loop.index }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus Akun Petugas">
+            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#hapusModal{{ loop.index }}" data-bs-placement="top" title="Hapus Akun Petugas">
               <i class="lni lni-trash-can"></i> Hapus
             </button>         
             
@@ -65,14 +65,14 @@
                           <!-- Teks di sebelah kanan -->
                           <div>
                               <p><strong>Simpan Perubahan</strong></p>
-                              <p>Apakah Anda yakin ingin menghapus akun <strong>{{ p[1] }}</strong>?</p>
+                              <p>Apakah Anda yakin ingin menghapus akun <strong>{{ p.username }}</strong>?</p>
                           </div>
                       </div>
                       <div class="modal-footer">
                           <!-- Tombol Batal -->
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
                           <!-- Tombol Ya untuk menghapus akun -->
-                          <form action="{{ url_for('hapus_akun', id_petugas=p[0]) }}" method="POST">
+                          <form action="{{ url_for('hapus_akun', id_petugas=p.id_admin) }}" method="POST">
                               <button type="submit" class="btn btn-tutup">Ya</button>
                           </form>
                       </div>

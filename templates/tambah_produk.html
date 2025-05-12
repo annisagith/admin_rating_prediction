@@ -1,59 +1,61 @@
-{% extends 'base.html' %}
-
-{% block title %}Tambah Data Produk{% endblock %}
-
-{% block header %}
+{% extends 'base.html' %} {% block title %}Tambah Data Produk{% endblock %} {% block header %}
 <div class="py-2 px-2 d-flex justify-content-between align-items-center">
-  <h2 class="title-header" >
-    <a href="{{ url_for('produk') }}" class="text-decoration-none text-dark">Data Produk ></a> Tambah Produk
-  </h2>
+  <h2 class="title-header"><a href="{{ url_for('produk') }}" class="text-decoration-none text-dark">Data Produk ></a> Tambah Produk</h2>
 </div>
-{% endblock %}
+{% endblock %} {% block content %}
+<div class="container">
+  <div class="text-center">
+    <h5>Form Tambah Produk</h5>
+    <p>Lengkapi form ini untuk menambahkan produk 🎉</p>
+  </div>
 
-{% block content %}
-    <div class="container">
-      <div class="text-center">
-        <h5>Form Tambah Produk</h5>
-        <p>Lengkapi form ini untuk menambahkan produk 🎉</p>
+  <form action="{{ url_for('tambah_produk') }}" method="post" enctype="multipart/form-data">
+    <div class="row justify-content-center h-100">
+      <!-- Kolom Kiri -->
+      <div class="col-md-5">
+        <div class="mb-3">
+          <label for="nama_produk" class="form-label">Nama Produk</label>
+          <input type="text" class="form-control" id="nama_produk" name="nama_produk" placeholder="Masukkan Nama Produk" autocomplete="off" required />
+        </div>
+        <div class="mb-3">
+          <label for="id_brand" class="form-label">Brand Produk</label>
+          <select class="form-control" id="id_brand" name="id_brand" required>
+            <option value="" disabled selected>Pilih Brand Produk</option>
+            {% for brand in brand_produk %}
+            <option value="{{ brand.id_brand }}">{{ brand.nama_brand }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="id_jenis" class="form-label">Jenis Produk</label>
+          <select class="form-control" id="id_jenis" name="id_jenis" required>
+            <option value="" disabled selected class="text-muted">Pilih Jenis Produk</option>
+            {% for jenis in jenis_produk %}
+            <option value="{{ jenis.id_jenis }}">{{ jenis.nama_jenis }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="harga" class="form-label">Harga</label>
+          <input type="number" class="form-control" id="harga" name="harga" min="0" placeholder="Masukkan Harga Produk" autocomplete="off" required />
+        </div>
       </div>
 
-      <form action="{{ url_for('tambah_produk') }}" method="post" enctype="multipart/form-data">
-        <div class="row justify-content-center h-100">
-          <!-- Kolom Kiri -->
-          <div class="col-md-5">
-            <div class="mb-3">
-              <label for="nama_produk" class="form-label">Nama Produk</label>
-              <input type="text" class="form-control" id="nama_produk" name="nama_produk" placeholder="Masukkan Nama Produk" autocomplete="off" required>
-            </div>
-            <div class="mb-3">
-              <label for="nama_brand" class="form-label">Nama Brand</label>
-              <input type="text" class="form-control" id="nama_brand" name="nama_brand" placeholder="Masukkan Nama Brand" autocomplete="off" required>
-            </div>
-            <div class="mb-3">
-                <label for="jenis" class="form-label">Jenis</label>
-                <input type="text" class="form-control" id="jenis" name="jenis" placeholder="Masukkan Jenis Produk" autocomplete="off" required>
-            </div>
-                <div class="mb-3">
-                <label for="harga" class="form-label">Harga</label>
-                <input type="number" class="form-control" id="harga" name="harga" min="0" placeholder="Masukkan Harga Produk" autocomplete="off" required>
-            </div>
-          </div>
-
-          <!-- Kolom Kanan -->
-          <div class="col-md-5">
-            <div class="mb-3">
-              <label for="deskripsi" class="form-label">Deskripsi</label>
-              <textarea class="form-control" id="deskripsi" name="deskripsi" rows="4" placeholder="Masukkan Deskripsi Produk" required></textarea>
-            </div>
-            <div class="mb-3">
-              <label for="foto" class="form-label">Foto</label>
-              <input type="file" class="form-control" id="foto" name="foto" accept="image/*" placeholder="Pilih Foto" autocomplete="off" required>
-            </div>
-            <div class="registration-form">
-              <button type="submit" class="signin">Simpan</button>
-            </div>
-          </div>
+      <!-- Kolom Kanan -->
+      <div class="col-md-5">
+        <div class="mb-3">
+          <label for="deskripsi" class="form-label">Deskripsi</label>
+          <textarea class="form-control" id="deskripsi" name="deskripsi" rows="4" placeholder="Masukkan Deskripsi Produk" required></textarea>
         </div>
-      </form>
-    </div> 
+        <div class="mb-3">
+          <label for="foto" class="form-label">Foto</label>
+          <input type="file" class="form-control" id="foto" name="foto" accept="image/*" placeholder="Pilih Foto" autocomplete="off" required />
+        </div>
+        <div class="registration-form">
+          <button type="submit" class="signin">Simpan</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
 {% endblock %}

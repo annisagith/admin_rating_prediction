@@ -27,25 +27,41 @@
       </div>
 
       <!-- Form Edit Produk -->
-      <form action="{{ url_for('edit_produk', id_produk=produk[0]) }}" method="post" enctype="multipart/form-data">
+      <form action="{{ url_for('edit_produk', id_produk=produk.id_produk) }}" method="post" enctype="multipart/form-data">
         <div class="row justify-content-center h-100">
           <!-- Kolom Kiri -->
           <div class="col-md-5">
             <div class="mb-3">
               <label for="nama_produk" class="form-label">Nama Produk</label>
-              <input type="text" class="form-control" id="nama_produk" name="nama_produk" value="{{ produk[1] }}" placeholder="Masukkan Nama Produk" autocomplete="off" required>
+              <input type="text" class="form-control" id="nama_produk" name="nama_produk" value="{{ produk.nama_produk }}" placeholder="Masukkan Nama Produk" autocomplete="off" required>
             </div>
             <div class="mb-3">
-              <label for="nama_brand" class="form-label">Nama Brand</label>
-              <input type="text" class="form-control" id="nama_brand" name="nama_brand" value="{{ produk[2] }}" placeholder="Masukkan Nama Brand" autocomplete="off" required>
-            </div>
+              <label for="id_brand" class="form-label">Brand Produk</label>
+              <select class="form-control" id="id_brand" name="id_brand" required>
+                  <option value="" disabled {% if not produk.id_brand %}selected{% endif %}>Pilih Brand Produk</option>
+                  {% for brand in brand_produk %}
+                      <option value="{{ brand.id_brand }}" {% if produk.id_brand == brand.id_brand %}selected{% endif %}>
+                          {{ brand.nama_brand }}
+                      </option>
+                  {% endfor %}
+              </select>
+            </div>           
             <div class="mb-3">
-                <label for="jenis" class="form-label">Jenis</label>
-                <input type="text" class="form-control" id="jenis" name="jenis" value="{{ produk[3] }}" placeholder="Masukkan Jenis Produk" autocomplete="off" required>
+              <label for="id_jenis" class="form-label">Jenis Produk</label>
+              <select class="form-control" id="id_jenis" name="id_jenis" onchange="toggleNewJenisField()" required>
+                  <option value="" disabled {% if not produk.id_jenis %}selected{% endif %}>Pilih Jenis Produk</option>
+                  {% for jenis in jenis_produk %}
+                      <option value="{{ jenis.id_jenis }}" {% if produk.id_jenis == jenis.id_jenis %}selected{% endif %}>
+                          {{ jenis.nama_jenis }}
+                      </option>
+                  {% endfor %}
+              </select>
             </div>
-                <div class="mb-3">
-                <label for="harga" class="form-label">Harga</label>
-                <input type="number" class="form-control" id="harga" name="harga" value="{{ produk[5] }}" min="0" placeholder="Masukkan Harga Produk" autocomplete="off" required>
+            
+
+            <div class="mb-3">
+              <label for="harga" class="form-label">Harga</label>
+              <input type="number" class="form-control" id="harga" name="harga" value="{{ produk.harga }}" min="0" placeholder="Masukkan Harga Produk" autocomplete="off" required>
             </div>
           </div>
 
@@ -53,7 +69,7 @@
           <div class="col-md-5">
             <div class="mb-3">
               <label for="deskripsi" class="form-label">Deskripsi</label>
-              <textarea class="form-control" id="deskripsi" name="deskripsi" rows="4" placeholder="Masukkan Deskripsi Produk" required>{{ produk[4] }}</textarea>
+              <textarea class="form-control" id="deskripsi" name="deskripsi" rows="4" placeholder="Masukkan Deskripsi Produk" required>{{ produk.deskripsi }}</textarea>
             </div>
             <div class="mb-3">
               <label for="foto" class="form-label">Foto</label>

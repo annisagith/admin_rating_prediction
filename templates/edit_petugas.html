@@ -26,23 +26,23 @@
         {% endwith %}
       </div>
 
-      <form action="{{ url_for('edit_data_petugas', id_petugas=petugas[0]) }}" method="post">
+      <form action="{{ url_for('edit_data_petugas', id_petugas=petugas.id_admin) }}" method="post">
         <div class="row justify-content-center h-100">
           <!-- Kolom Kiri -->
           <div class="col-md-5">
             <div class="mb-3">
               <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
-              <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" value="{{ petugas[4] }}" placeholder="Masukkan Nama Lengkap" autocomplete="off" required>
+              <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" value="{{ petugas.nama_lengkap }}" placeholder="Masukkan Nama Lengkap" autocomplete="off" required>
             </div>
             <div class="mb-3">
               <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" name="email" value="{{ petugas[3] }}" placeholder="Masukkan Email" autocomplete="off" required>
+              <input type="email" class="form-control" id="email" name="email" value="{{ petugas.email }}" placeholder="Masukkan Email" autocomplete="off" required>
             </div>
             <div class="mb-3">
               <label for="role" class="form-label">Role</label>
                 <select class="form-select" name="role" id="role" required>
-                  <option value="admin" {% if petugas[5] == 'admin' %}selected{% endif %}>Petugas</option>
-                  <option value="superadmin" {% if petugas[5] == 'superadmin' %}selected{% endif %}>Super Admin</option>
+                  <option value="admin" {% if petugas.role == 'admin' %}selected{% endif %}>Petugas</option>
+                  <option value="superadmin" {% if petugas.role == 'superadmin' %}selected{% endif %}>Super Admin</option>
                 </select>
             </div>
           </div>
@@ -51,7 +51,7 @@
           <div class="col-md-5">
             <div class="mb-3">
               <label for="username" class="form-label">Username</label>
-              <input type="text" class="form-control" id="username" name="username" value="{{ petugas[1] }}" placeholder="Masukkan Username" autocomplete="off" required>
+              <input type="text" class="form-control" id="username" name="username" value="{{ petugas.username }}" placeholder="Masukkan Username" autocomplete="off" required>
             </div>
             <div class="mb-3">
               <label for="password" class="form-label">Password</label>
