@@ -73,7 +73,46 @@ def index():
 
     cursor.execute("SELECT COUNT(*) AS total FROM ulasan")
     total_ulasan = cursor.fetchone()['total']
+    
+    # Query jumlah ulasan berdasarkan status_rating
+    cursor.execute("""
+        SELECT status_rating, COUNT(*) AS jumlah
+        FROM ulasan
+        GROUP BY status_rating
+    """)
+    pie_data_raw = cursor.fetchall()
 
+    # Ubah tuple ke list of dict
+    pie_data = [{'status_rating': row['status_rating'], 'jumlah': row['jumlah']} for row in pie_data_raw]
+
+    # Urutan custom (opsional)
+    order = {'Manual': 0, 'Model': 1}
+    pie_data.sort(key=lambda x: order.get(x['status_rating'], 99))
+
+    # Siapkan data untuk chart
+    pie_labels = [row['status_rating'] for row in pie_data]
+    pie_counts = [row['jumlah'] for row in pie_data]
+
+    # Query jumlah ulasan berdasarkan status_rating
+    cursor.execute("""
+        SELECT SUM(CASE WHEN u.rating_sentimen = 1 THEN 1 ELSE 0 END) AS rating_1,
+        SUM(CASE WHEN u.rating_sentimen = 2 THEN 1 ELSE 0 END) AS rating_2,
+        SUM(CASE WHEN u.rating_sentimen = 3 THEN 1 ELSE 0 END) AS rating_3,
+        SUM(CASE WHEN u.rating_sentimen = 4 THEN 1 ELSE 0 END) AS rating_4,
+        SUM(CASE WHEN u.rating_sentimen = 5 THEN 1 ELSE 0 END) AS rating_5 
+        FROM ulasan u
+    """)
+    bar_data = cursor.fetchone()
+    
+    # Persiapkan data untuk chart
+    bar_labels = ['1', '2', '3', '4', '5']
+    bar_counts = [
+        int(bar_data['rating_1']),
+        int(bar_data['rating_2']),
+        int(bar_data['rating_3']),
+        int(bar_data['rating_4']),
+        int(bar_data['rating_5'])
+    ]
     cursor.close()
 
     return render_template('index.html',
@@ -81,7 +120,11 @@ def index():
                            total_produk=total_produk,
                            total_admin=total_admin,
                            total_brand=total_brand,
-                           total_ulasan=total_ulasan)
+                           total_ulasan=total_ulasan,  
+                           pie_labels=pie_labels,
+                           pie_counts=pie_counts,
+                           bar_labels=bar_labels, 
+                           bar_counts=bar_counts)
 
 @app.route('/login/', methods=('GET', 'POST'))
 def login():
@@ -133,13 +176,15 @@ def produk():
     
     if search_query:
         # Jika ada pencarian, filter berdasarkan nama produk
+        like_query = '%' + search_query + '%'
         cursor.execute("""
-            SELECT COUNT(*) 
+            SELECT COUNT(*)
             FROM produk p
             LEFT JOIN jenis_produk jp ON p.id_jenis = jp.id_jenis
             LEFT JOIN brand b ON p.id_brand = b.id_brand
-            WHERE p.nama_produk LIKE %s
-        """, ('%' + search_query + '%',))
+            WHERE p.nama_produk LIKE %s OR jp.nama_jenis LIKE %s OR b.nama_brand LIKE %s
+        """, (like_query, like_query, like_query))
+
     else:
         # Jika tidak ada pencarian, hitung semua produk
         cursor.execute("""
@@ -154,21 +199,25 @@ def produk():
     if search_query:
         # Jika ada pencarian, ambil produk yang sesuai dengan kata kunci
         cursor.execute('''
-            SELECT p.*, jp.nama_jenis, b.nama_brand
+            SELECT p.*, jp.nama_jenis, b.nama_brand, COALESCE(ROUND(AVG(u.rating_sentimen), 1), 0) AS rata_rata_rating, COALESCE(COUNT(u.id_ulasan), 0) AS jumlah_ulasan
             FROM produk p
             LEFT JOIN jenis_produk jp ON p.id_jenis = jp.id_jenis
             LEFT JOIN brand b ON p.id_brand = b.id_brand
-            WHERE p.nama_produk LIKE %s 
+            LEFT JOIN ulasan u ON u.id_produk = p.id_produk
+            WHERE p.nama_produk LIKE %s OR jp.nama_jenis LIKE %s OR b.nama_brand LIKE %s
+            GROUP BY p.id_produk
             ORDER BY p.updated_at DESC
             LIMIT %s OFFSET %s
-        ''', ('%' + search_query + '%', per_page, offset))
+            ''', (like_query, like_query, like_query, per_page, offset))
     else:
         # Jika tidak ada pencarian, ambil semua produk
         cursor.execute('''
-            SELECT p.*, jp.nama_jenis, b.nama_brand
+            SELECT p.*, jp.nama_jenis, b.nama_brand, COALESCE(ROUND(AVG(u.rating_sentimen), 1), 0) AS rata_rata_rating, COALESCE(COUNT(u.id_ulasan), 0) AS jumlah_ulasan
             FROM produk p
             LEFT JOIN jenis_produk jp ON p.id_jenis = jp.id_jenis
             LEFT JOIN brand b ON p.id_brand = b.id_brand
+            LEFT JOIN ulasan u ON u.id_produk = p.id_produk
+            GROUP BY p.id_produk
             ORDER BY p.updated_at DESC
             LIMIT %s OFFSET %s
         ''', (per_page, offset))
@@ -328,29 +377,7 @@ def hapus_produk(id_produk):
         
     flash('Produk berhasil dihapus!', 'success')
     return redirect(url_for('produk'))
-
-# detail produk
-@app.route('/produk/detail/<string:id_produk>')
-def detail_produk(id_produk):
-    if 'loggedin' not in session:
-        flash('Harap Login Dulu', 'danger')
-        return redirect(url_for('login'))
-    
-    conn = mysql.connection
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM produk WHERE id_produk = %s", (id_produk,))
-    produk = cursor.fetchone()
-
-    cursor.close()
-
-    if produk is None:
-        flash('Produk tidak ditemukan', 'danger')
-        return redirect(url_for('produk'))
-
-    return render_template('detail_produk.html', produk=produk) 
    
-# halaman kelola data petugas
 @app.route('/petugas')
 @role_required(['superadmin'])  # hanya superadmin
 def petugas():
@@ -358,40 +385,44 @@ def petugas():
         flash('Harap Login Dulu', 'danger')
         return redirect(url_for('login'))
     
-    search_query = request.args.get('search', '')  # Mendapatkan kata kunci pencarian
+    search_query = request.args.get('search', '')
     
     page = request.args.get('page', 1, type=int)
     per_page = 5
     offset = (page - 1) * per_page
     
     cursor = mysql.connection.cursor()
-
+    
     if search_query:
-        # Jika ada pencarian, filter berdasarkan nama produk
+        like_query = '%' + search_query + '%'
+        # Hitung total hasil pencarian
         cursor.execute("""
-            SELECT COUNT(*) FROM admin WHERE username LIKE %s
-        """, ('%' + search_query + '%',))
+            SELECT COUNT(*) FROM admin 
+            WHERE username LIKE %s OR email LIKE %s OR nama_lengkap LIKE %s OR role LIKE %s
+        """, (like_query, like_query, like_query, like_query))
+        total_akun = cursor.fetchone()['COUNT(*)']
+        
+        # Ambil data sesuai pencarian
+        cursor.execute("""
+            SELECT * FROM admin 
+            WHERE username LIKE %s OR email LIKE %s OR nama_lengkap LIKE %s OR role LIKE %s
+            LIMIT %s OFFSET %s
+        """, (like_query, like_query, like_query, like_query, per_page, offset))
     else:
-        # Jika tidak ada pencarian, hitung semua produk
+        # Total seluruh data
         cursor.execute("SELECT COUNT(*) FROM admin")
+        total_akun = cursor.fetchone()['COUNT(*)']
         
-    total_akun = cursor.fetchone()['COUNT(*)']
-
-    if search_query:
-        # Jika ada pencarian, ambil produk yang sesuai dengan kata kunci
-        cursor.execute('''
-            SELECT * FROM admin WHERE username LIKE %s LIMIT %s OFFSET %s
-        ''', ('%' + search_query + '%', per_page, offset))
-    else:
-        # Jika tidak ada pencarian, ambil semua produk        
-        cursor.execute('SELECT * FROM admin LIMIT %s OFFSET %s', (per_page, offset))    
-        
+        # Ambil data normal (tanpa pencarian)
+        cursor.execute("SELECT * FROM admin LIMIT %s OFFSET %s", (per_page, offset))
+    
     petugas = cursor.fetchall()
     cursor.close()
     
     total_pages = (total_akun + per_page - 1) // per_page
     
     return render_template('petugas.html', show_search=True, petugas=petugas, page=page, total_pages=total_pages, search=search_query)
+
 
 # halaman buat akun petugas
 @app.route('/petugas/buat_akun_petugas/', methods=('GET', 'POST'))
@@ -617,9 +648,9 @@ def aktivitas():
             WHERE a.nama_lengkap LIKE %s OR p.nama_produk LIKE %s
         """, ('%' + search_query + '%', '%' + search_query + '%'))
     else:
-        cursor.execute("SELECT COUNT(*) FROM log_aktivitas")
+        cursor.execute("SELECT COUNT(*) as total FROM log_aktivitas")
         
-    total_logs = cursor.fetchone()['COUNT(*)']
+    total_logs = cursor.fetchone()['total']
     
     # Ambil data log aktivitas dengan filter dan pagination
     if search_query:

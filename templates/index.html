@@ -1,5 +1,4 @@
-{% extends 'base.html' %} {% block title %}Kelola Dashboard{% endblock %} {%
-block header %}
+{% extends 'base.html' %} {% block title %}Kelola Dashboard{% endblock %} {% block header %}
 <div class="py-2 px-2 d-flex justify-content-between align-items-center mb-3">
   <h2 class="title-header">Dashboard</h2>
 </div>
@@ -51,25 +50,94 @@ block header %}
   </div>
 </div>
 <div class="row mt-4">
-  <div class="col-md-6">
-    <div
-      class="chart-container shadow-sm p-3 rounded"
-      style="background: #fff; height: 100%"
-    >
-      <h6>Persebaran Rating Manual dan Model</h6>
+  <div class="col-md-5">
+    <div class="chart-container shadow-sm rounded" style="background: #fff">
       <canvas id="ratingPieChart"></canvas>
     </div>
   </div>
 
-  <div class="col-md-6">
-    <div
-      class="chart-container shadow-sm p-3 rounded"
-      style="background: #fff; height: 100%"
-    >
-      <h6>Persebaran Nilai Rating</h6>
+  <div class="col-md-7">
+    <div class="chart-container shadow-sm rounded" style="background: #fff">
       <canvas id="ratingBarchart"></canvas>
     </div>
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctxPie = document.getElementById('ratingPieChart').getContext('2d');
+  const ratingPieChart = new Chart(ctxPie, {
+    type: 'pie',
+    data: {
+      labels: {{ pie_labels | tojson }},
+      datasets: [{
+        label: 'Jumlah Ulasan',
+        data: {{ pie_counts | tojson }},
+        backgroundColor: [
+          'rgba(111, 209, 142, 1)',
+          'rgba(255, 174, 76, 0.6)'
+        ],
+        borderColor: [
+          'rgba(111, 209, 142, 1)',
+          'rgba(255, 174, 76, 0.6)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Perbandingan Ulasan Manual dan Model'
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.parsed || 0;
+              return `${label}: ${value}`;
+            }
+          }
+        }
+      }
+    }
+  });
+</script>
+
+<!-- grafik distribusi rating -->
+<script>
+  const ctx = document.getElementById('ratingBarchart').getContext('2d');
+  const ratingChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['⭐', '⭐⭐', '⭐⭐⭐' , '⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'],
+      datasets: [{
+        label: 'Jumlah Ulasan',
+        data: {{ bar_counts | safe }},
+        backgroundColor: 'rgba(166, 125, 121, 0.6)',
+        borderColor: 'rgba(166, 125, 121, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      scales: {
+        x: {
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: 'Persebaran Jumlah Ulasan Berdasarkan Rating'
+        },
+        legend: {
+          display: false
+        }
+      }
+    }
+  });
+</script>
 
 {% endblock %}

@@ -1,14 +1,21 @@
-{% extends 'base.html' %} {% block title %}Kelola Data Produk{% endblock %} {% block header %}
+{% extends 'base.html' %} 
+{% block title %}Kelola Data Produk{% endblock %} 
+{% block header %}
 <div class="py-2 px-2 d-flex justify-content-between align-items-center mb-3">
   <h2 class="title-header">Data Produk</h2>
   <a href="{{ url_for('tambah_produk') }}" class="btn-custom btn"> <i class="lni lni-plus"></i> Tambah Produk </a>
 </div>
-{% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+{% with messages = get_flashed_messages(with_categories=true) %} 
+{% if messages %} 
+{% for category, message in messages %}
 <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
   <strong>{{ message }}</strong>
   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
-{% endfor %} {% endif %} {% endwith %} {% endblock %} {% block content %} {% if produk %}
+{% endfor %} 
+{% endif %} 
+{% endwith %} 
+{% endblock %} {% block content %} {% if produk %}
 <table class="table table-striped">
   <thead>
     <tr>
@@ -24,7 +31,7 @@
   <tbody>
     {% for p in produk %}
     <tr>
-      <th scope="row">{{ loop.index }}</th>
+      <th scope="row">{{ loop.index + ((page - 1) * 5) }}</th>
       <td>{{ p.nama_produk }}</td>
       <!-- nama_produk -->
       <td>{{ p.nama_brand }}</td>
@@ -33,7 +40,7 @@
       <!-- jenis_produk -->
       <td>Rp {{ "{:,.0f}".format(p.harga|int).replace(',', '.') }}</td>
       <!-- harga -->
-      <td>{{ p.rating_total }}</td>
+      <td>{{ p.rata_rata_rating }}</td>
       <!-- rating_total -->
       <td>
         <!-- Tombol Edit -->
@@ -88,11 +95,33 @@
                   <h5 class="brand-produk"><strong>{{ p.nama_brand }}</strong></h5>
                   <p class="nama-produk">{{ p.nama_produk }}</p>
                   <p class="harga-produk">Rp {{ "{:,.0f}".format(p.harga|int).replace(',', '.') }}</p>
-                  <p class="jumlah-review">jumlah review</p>
-                  <p class="rating-produk">{{ p.rating_total }}</p>
-                  <p class="deskripsi-produk">{{ p.deskrispi }}</p>
+                  <p class="jumlah-review">{{ p.jumlah_ulasan }} ulasan</p>
+                  <div class="d-flex gap-2 align-items-center">
+                    <p class="rating-produk mt-1">{{ p.rata_rata_rating }}</p>
+                    <div class="icon-rating text-warning d-flex custom-stars">
+                        {% set full_stars = p.rata_rata_rating| int %}
+                        {% set half_star = 1 if p.rata_rata_rating - full_stars >= 0.5 else 0 %}
+                        {% set empty_stars = 5 - full_stars - half_star %}
+
+                        {# Bintang penuh #}
+                        {% for i in range(full_stars) %}
+                            <i class="fas fa-star fa-sm"></i>
+                        {% endfor %}
+
+                        {# Setengah bintang #}
+                        {% if half_star %}
+                            <i class="fas fa-star-half-alt fa-sm"></i>
+                        {% endif %}
+
+                        {# Bintang kosong #}
+                        {% for i in range(empty_stars) %}
+                            <i class="far fa-star fa-sm"></i>
+                        {% endfor %}
+                    </div>
+                  </div>
+                  <p class="deskripsi-produk">{{ p.deskripsi }}</p>
                 </div>
-              </div>
+              </div> 
               <div class="modal-footer">
                 <button class="btn btn-tutup" data-bs-dismiss="modal">Tutup</button>
               </div>
