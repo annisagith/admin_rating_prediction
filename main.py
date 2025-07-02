@@ -93,7 +93,7 @@ def index():
     pie_labels = [row['status_rating'] for row in pie_data]
     pie_counts = [row['jumlah'] for row in pie_data]
 
-    # Query jumlah ulasan berdasarkan status_rating
+    # Query jumlah ulasan berdasarkan status_rating manual
     cursor.execute("""
         SELECT SUM(CASE WHEN u.rating_sentimen = 1 THEN 1 ELSE 0 END) AS rating_1,
         SUM(CASE WHEN u.rating_sentimen = 2 THEN 1 ELSE 0 END) AS rating_2,
@@ -101,17 +101,40 @@ def index():
         SUM(CASE WHEN u.rating_sentimen = 4 THEN 1 ELSE 0 END) AS rating_4,
         SUM(CASE WHEN u.rating_sentimen = 5 THEN 1 ELSE 0 END) AS rating_5 
         FROM ulasan u
+        WHERE status_rating = 'manual'
     """)
-    bar_data = cursor.fetchone()
+    bar_manual = cursor.fetchone()
     
     # Persiapkan data untuk chart
     bar_labels = ['1', '2', '3', '4', '5']
-    bar_counts = [
-        int(bar_data['rating_1']),
-        int(bar_data['rating_2']),
-        int(bar_data['rating_3']),
-        int(bar_data['rating_4']),
-        int(bar_data['rating_5'])
+    bar_manual_counts = [
+        int(bar_manual['rating_1']),
+        int(bar_manual['rating_2']),
+        int(bar_manual['rating_3']),
+        int(bar_manual['rating_4']),
+        int(bar_manual['rating_5'])
+    ]
+    
+    # Query jumlah ulasan berdasarkan status_rating model
+    cursor.execute("""
+        SELECT SUM(CASE WHEN u.rating_sentimen = 1 THEN 1 ELSE 0 END) AS rating_1,
+        SUM(CASE WHEN u.rating_sentimen = 2 THEN 1 ELSE 0 END) AS rating_2,
+        SUM(CASE WHEN u.rating_sentimen = 3 THEN 1 ELSE 0 END) AS rating_3,
+        SUM(CASE WHEN u.rating_sentimen = 4 THEN 1 ELSE 0 END) AS rating_4,
+        SUM(CASE WHEN u.rating_sentimen = 5 THEN 1 ELSE 0 END) AS rating_5 
+        FROM ulasan u
+        WHERE status_rating = 'model'
+    """)
+    bar_model = cursor.fetchone()
+    
+    # Persiapkan data untuk chart
+    bar_labels = ['1', '2', '3', '4', '5']
+    bar_model_counts = [
+        int(bar_model['rating_1']),
+        int(bar_model['rating_2']),
+        int(bar_model['rating_3']),
+        int(bar_model['rating_4']),
+        int(bar_model['rating_5'])
     ]
     cursor.close()
 
@@ -124,7 +147,8 @@ def index():
                            pie_labels=pie_labels,
                            pie_counts=pie_counts,
                            bar_labels=bar_labels, 
-                           bar_counts=bar_counts)
+                           bar_manual_counts=bar_manual_counts,
+                           bar_model_counts=bar_model_counts)
 
 @app.route('/login/', methods=('GET', 'POST'))
 def login():
